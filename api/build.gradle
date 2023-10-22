@@ -7,14 +7,13 @@ plugins {
 version = '0.0.1'
 description = "Stream API"
 group = 'com.crafts'
-archivesBaseName = 'stream-api'
 
 java {
     sourceCompatibility = '17'
 }
 
 ext {
-    lombokVersion = "1.18.24"
+    lombokVersion = "1.18.30"
 }
 
 repositories {

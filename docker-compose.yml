@@ -3,7 +3,6 @@ version: '3.8'
 services:
   stream-api:
     container_name: stream-api
-    platform: linux/amd64
     build:
       dockerfile: api/Dockerfile
       context: .
@@ -15,7 +14,6 @@ services:
     restart: always
   stream-app:
     container_name: stream-app
-    platform: linux/amd64
     build:
       dockerfile: app/Dockerfile
       context: .
