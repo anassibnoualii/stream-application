@@ -36,8 +36,8 @@ public class StreamApplication implements CommandLineRunner {
         .toStream()
         .forEach(
             s -> {
-              log.info("data from stream: {}", s);
-              kafkaProducer.loadData(s);
+              // log.info("data from stream: {}", s);
+              // kafkaProducer.loadData(s);
             });
     List.of(AppIndices.STREAM)
         .forEach(
