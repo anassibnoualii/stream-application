@@ -6,7 +6,7 @@ COPY api .
 
 RUN gradle clean bootJar
 
-FROM openjdk:17-slim
+FROM --platform=linux/amd64 eclipse-temurin:17-jre-alpine
 
 COPY --from=build app/build/libs/*.jar /stream-api.jar
 
