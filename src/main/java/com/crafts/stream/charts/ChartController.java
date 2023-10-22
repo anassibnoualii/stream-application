@@ -1,21 +1,29 @@
 package com.crafts.stream.charts;
 
-import java.util.Arrays;
-import java.util.List;
+import com.crafts.stream.elasticsearch.search.SearchFilter;
+import com.crafts.stream.elasticsearch.search.SearchService;
+import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@Slf4j
 public class ChartController {
+  private final SearchService searchService;
+
+  public ChartController(SearchService searchService) {
+    this.searchService = searchService;
+  }
+
   @GetMapping("/chart")
-  public String chart(Model model) {
-    List<Integer> chartData = Arrays.asList(10, 20, 30, 40, 50);
-    List<String> chartLabels = Arrays.asList("A", "B", "C", "D", "E");
+  public String chart(Model model) throws IOException {
 
-    model.addAttribute("chartData", chartData);
-    model.addAttribute("chartLabels", chartLabels);
+    SearchFilter filter = new SearchFilter();
+    filter.setIndex("stream");
+    model.addAttribute("chartData", searchService.streams(filter));
 
-    return "chart"; // The name of your Thymeleaf template file (without the ".html" extension).
+    return "chart";
   }
 }

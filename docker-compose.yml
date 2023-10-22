@@ -2,13 +2,13 @@ version: '3.8'
 
 services:
   stream-app:
-    container_name: "stream-app"
+    container_name: stream-app
     platform: linux/amd64
     build:
       dockerfile: Dockerfile
       context: .
     ports:
-      - "8088:8088"
+      - "8081:8081"
     depends_on:
       - kafka
       - elasticsearch

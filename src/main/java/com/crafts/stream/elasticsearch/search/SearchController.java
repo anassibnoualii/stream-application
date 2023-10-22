@@ -18,6 +18,6 @@ public class SearchController {
 
   @PostMapping("/search")
   public ResponseEntity<Object> scenarios(@RequestBody SearchFilter filter) throws IOException {
-    return new ResponseEntity<>(searchService.scenarios(filter), HttpStatus.OK);
+    return new ResponseEntity<>(searchService.streams(filter), HttpStatus.OK);
   }
 }

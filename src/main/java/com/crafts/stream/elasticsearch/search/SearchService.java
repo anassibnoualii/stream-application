@@ -3,15 +3,13 @@ package com.crafts.stream.elasticsearch.search;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query.Builder;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
-import co.elastic.clients.util.ObjectBuilder;
+import com.crafts.stream.elasticsearch.search.KeyValue.KeyValueBuilder;
+import com.crafts.stream.elasticsearch.search.SearchMetric.SearchMetricBuilder;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,79 +21,55 @@ public class SearchService {
 
   private final ElasticsearchClient esClient;
 
-  private static Double getAggregateValue(Entry<String, Aggregate> entry) {
-    if (entry.getValue().isValueCount()) {
-      return entry.getValue().valueCount().value();
-    }
-    if (entry.getValue().isSum()) {
-      return entry.getValue().sum().value();
-    }
-    if (entry.getValue().isMax()) {
-      return entry.getValue().max().value();
-    } else return null;
+  public List<SearchMetric> streams(SearchFilter filter) throws IOException {
+    Map<String, Aggregate> aggregations = performSearch(filter);
+    log.info(aggregations.toString());
+
+    return aggregations.entrySet().stream().map(this::mapAggregateToSearchMetric).toList();
   }
 
-  private static Function<Builder, ObjectBuilder<Query>> lastDateQuery(SearchFilter filter) {
-    return m ->
-        m.range(
-            r -> {
-              r.field("lastModifiedDate");
-              if (filter.getFormat() != null) {
-                r.format(filter.getFormat());
-              }
-              if (filter.getStartDate() != null) {
-                r.from(filter.getStartDate());
-              }
-              if (filter.getEndDate() != null) {
-                r.to(filter.getEndDate());
-              }
-              return r;
-            });
-  }
-
-  private static Function<Builder, ObjectBuilder<Query>> tenantQuery(String tenant) {
-    return m -> m.term(t -> t.field("tenant").value(tenant));
-  }
-
-  private static Function<Builder, ObjectBuilder<Query>> fieldQuery(SearchFilter searchFilter) {
-    return m -> m.term(t -> t.field(searchFilter.getField()).value(searchFilter.getFieldValue()));
-  }
-
-  public Object scenarios(SearchFilter filter) throws IOException {
-
+  private Map<String, Aggregate> performSearch(SearchFilter filter) throws IOException {
     return esClient
-        .search(
-            s ->
-                s.index(filter.getIndex())
-                    .query(
-                        q ->
-                            q.bool(
-                                b ->
-                                    b.must(tenantQuery(filter.getTenant()))
-                                        .must(lastDateQuery(filter))
-                                        .must(fieldQuery(filter))))
-                    .aggregations(scenarioMetrics()),
-            Void.class)
-        .aggregations()
-        .entrySet()
-        .stream()
-        .map(this::mapMetricToValue)
+        .search(s -> s.index(filter.getIndex()).aggregations(streamAggregations()), Void.class)
+        .aggregations();
+  }
+
+  private SearchMetric mapAggregateToSearchMetric(Map.Entry<String, Aggregate> entry) {
+    String key = entry.getKey();
+    Aggregate value = entry.getValue();
+    List<KeyValue> metric = createKeyValueList(value);
+    log.info("key: {}", key);
+    log.info("values: {}", metric);
+    return new SearchMetricBuilder().key(key).metrics(metric).build();
+  }
+
+  private List<KeyValue> createKeyValueList(Aggregate value) {
+
+    if (value.isLterms()) {
+      return value.lterms().buckets().array().stream()
+          .map(
+              bucket ->
+                  new KeyValueBuilder()
+                      .key(bucket.keyAsString())
+                      .value(String.valueOf(bucket.docCount()))
+                      .build())
+          .toList();
+    }
+    return value.sterms().buckets().array().stream()
+        .map(
+            bucket ->
+                new KeyValueBuilder()
+                    .key(bucket.key().stringValue())
+                    .value(String.valueOf(bucket.docCount()))
+                    .build())
         .toList();
   }
 
-  private Map<String, Aggregation> scenarioMetrics() {
-    Aggregation a = new Aggregation.Builder().sum(b -> b.field("automated")).build();
-    Aggregation m = new Aggregation.Builder().sum(b -> b.field("manual")).build();
-    Aggregation r = new Aggregation.Builder().sum(b -> b.field("requirement")).build();
-    Aggregation t = new Aggregation.Builder().valueCount(b -> b.field("id")).build();
-    return Map.of("automated", a, "manual", m, "requirement", r, "tests", t);
-  }
-
-  private KeyValueBase mapMetricToValue(Entry<String, Aggregate> aggregateEntry) {
-    return KeyValueBase.builder()
-        .key(aggregateEntry.getKey())
-        .value(getAggregateValue(aggregateEntry))
-        .build();
+  private Map<String, Aggregation> streamAggregations() {
+    Aggregation a = new Aggregation.Builder().terms(b -> b.field("type.keyword")).build();
+    Aggregation m = new Aggregation.Builder().terms(b -> b.field("meta.domain.keyword")).build();
+    Aggregation r = new Aggregation.Builder().terms(b -> b.field("bot")).build();
+    return Map.of("Changes by type", a, "Changes by domain", m, "Changes by bot", r);
   }
 
   public void createIndex(String indexName) throws IOException {
