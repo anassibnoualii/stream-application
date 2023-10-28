@@ -27,27 +27,6 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: 'app/yarn.lock'
 
-      - name: Cache API Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: api/.gradle/caches
-          key: ${{ runner.os }}-gradle-api-${{ hashFiles('api/build.gradle', 'api/settings.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle-api
-
-      - name: Cache Producer Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: producer/.gradle/caches
-          key: ${{ runner.os }}-gradle-producer-${{ hashFiles('producer/build.gradle', 'producer/settings.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle-producer
-
-      - name: Cache YARN packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.yarn
-          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node
-
       - name: Build api
         run: ./gradlew build
         working-directory: api
