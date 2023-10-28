@@ -26,13 +26,13 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
         restore-keys: ${{ runner.os }}-gradle
 
-    - name: Build Spring Boot App 1
+    - name: Build api
       run: ./gradlew build
-      working-directory: spring-boot-app-1
+      working-directory: api
 
-    - name: Build Spring Boot App 2
+    - name: Build producer
       run: ./gradlew build
-      working-directory: spring-boot-app-2
+      working-directory: producer
 
     - name: Set up Node.js 18
       uses: actions/setup-node@v2
@@ -46,9 +46,9 @@ jobs:
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: ${{ runner.os }}-node
 
-    - name: Build React App
+    - name: Build App
       run: npm ci && npm run build
-      working-directory: react-app
+      working-directory: app
 
     - name: Deploy to server
       run: |
