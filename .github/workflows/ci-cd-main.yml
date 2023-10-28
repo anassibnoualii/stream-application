@@ -32,11 +32,9 @@ jobs:
 
       - name: Build Display info
         run: pwd && ls -l
-        working-directory: api
 
       - name: Build Docker Image for api
         run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/api:${{ github.sha }} -f api/Dockerfile .
-        working-directory: api
 
       - name: Build producer
         run: ./gradlew build
@@ -44,7 +42,6 @@ jobs:
 
       - name: Build Docker Image for producer
         run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/producer:${{ github.sha }} -f producer/Dockerfile .
-        working-directory: producer
 
       - name: Set up Node.js 18
         uses: actions/setup-node@v3
@@ -63,8 +60,7 @@ jobs:
         working-directory: app
 
       - name: Build Docker Image for App
-        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/app:${{ github.sha }} -f api/Dockerfile .
-        working-directory: app
+        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/app:${{ github.sha }} -f app/Dockerfile .
 
       - name: Log in to Docker registry
         run: echo "${{ secrets.DOCKER_REGISTRY_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_REGISTRY_USER }} -p "${{ secrets.DOCKER_REGISTRY_TOKEN }}" ${{ secrets.DOCKER_REGISTRY }} --password-stdin
