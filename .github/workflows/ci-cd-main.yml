@@ -20,6 +20,33 @@ jobs:
           distribution: 'adopt'
           cache: gradle
 
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Cache API Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: api/.gradle/caches
+          key: ${{ runner.os }}-gradle-api-${{ hashFiles('api/build.gradle', 'api/settings.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle-api
+
+      - name: Cache Producer Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: producer/.gradle/caches
+          key: ${{ runner.os }}-gradle-producer-${{ hashFiles('producer/build.gradle', 'producer/settings.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle-producer
+
+      - name: Cache YARN packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.yarn
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-node
+
       - name: Build api
         run: ./gradlew build
         working-directory: api
@@ -28,16 +55,11 @@ jobs:
         run: ./gradlew build
         working-directory: producer
 
-      - name: Set up Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'yarn'
+      - name: Build App
         run: |
           yarn install --frozen-lockfile
           yarn build
         working-directory: app
-
 
       - name: Build Docker Images
         run: |
