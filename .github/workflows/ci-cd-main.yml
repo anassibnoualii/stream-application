@@ -13,34 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'adopt'
-          cache: gradle
-
-      - name: Set up Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'yarn'
-          cache-dependency-path: 'app/yarn.lock'
-
-      - name: Build api
-        run: ./gradlew build
-        working-directory: api
-
-      - name: Build producer
-        run: ./gradlew build
-        working-directory: producer
-
-      - name: Build App
-        run: |
-          yarn install --frozen-lockfile
-          yarn build
-        working-directory: app
-
       - name: Build Docker Images
         run: |
           docker build -t ${{ secrets.DOCKER_REGISTRY }}/api:${{ github.ref_name }} -f api/Dockerfile .
