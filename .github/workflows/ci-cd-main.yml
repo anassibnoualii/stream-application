@@ -31,7 +31,7 @@ jobs:
         working-directory: api
 
       - name: Build Docker Image for api
-        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/api:${{ github.sha }} .
+        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/api:${{ github.sha }} -f api/Dockerfile .
         working-directory: api
 
       - name: Build producer
@@ -39,7 +39,7 @@ jobs:
         working-directory: producer
 
       - name: Build Docker Image for producer
-        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/producer:${{ github.sha }} .
+        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/producer:${{ github.sha }} -f producer/Dockerfile .
         working-directory: producer
 
       - name: Set up Node.js 18
@@ -59,7 +59,7 @@ jobs:
         working-directory: app
 
       - name: Build Docker Image for App
-        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/app:${{ github.sha }} .
+        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/app:${{ github.sha }} -f api/Dockerfile .
         working-directory: app
 
       - name: Log in to Docker registry
