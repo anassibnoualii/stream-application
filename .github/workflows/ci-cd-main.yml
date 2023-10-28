@@ -77,8 +77,13 @@ jobs:
           docker push ${{ secrets.DOCKER_REGISTRY }}/producer:${{ github.ref_name }}
           docker push ${{ secrets.DOCKER_REGISTRY }}/app:${{ github.ref_name }}
 
-      - name: Deploy to server
-        run: |
-          # Add your deployment commands here
+      - name: Deploy to Heroku
+        id: heroku
+        uses: snithyanantham/docker-compose-multiple-apps-heroku-deploy@v1.0
+        with:
+          email: ${{ secrets.EMAIL }}
+          api_key: ${{ secrets.HEROKU_API_KEY }}
+          docker_compose_file: './docker-compose.prod.yml'
+          heroku_apps: '[{"imagename":"app","appname":"app","apptype":"web"},{"imagename":"api","appname":"api","apptype":"java"},{"imagename":"producer","appname":"producer","apptype":"java"}]'
         env:
           CI: true
