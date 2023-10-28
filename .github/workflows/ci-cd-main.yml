@@ -63,7 +63,7 @@ jobs:
         run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/app:${{ github.sha }} -f app/Dockerfile .
 
       - name: Log in to Docker registry
-        run: docker login -u ${{ secrets.DOCKER_REGISTRY_USER }} -p "${{ secrets.DOCKER_REGISTRY_TOKEN }}" "${{ secrets.DOCKER_REGISTRY }}" --password-stdin
+        run: docker login -u ${{ secrets.DOCKER_REGISTRY_USER }} -p ${{ secrets.DOCKER_REGISTRY_TOKEN }} ${{ secrets.DOCKER_REGISTRY }}
 
       - name: Push Docker images to registry
         run: |
