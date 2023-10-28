@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - main
+      - '*'
 
 jobs:
   build-and-deploy:
@@ -34,14 +34,14 @@ jobs:
         run: pwd && ls -l
 
       - name: Build Docker Image for api
-        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/api:${{ github.sha }} -f api/Dockerfile .
+        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/api:${{ github.ref }} -f api/Dockerfile .
 
       - name: Build producer
         run: ./gradlew build
         working-directory: producer
 
       - name: Build Docker Image for producer
-        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/producer:${{ github.sha }} -f producer/Dockerfile .
+        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/producer:${{ github.ref }} -f producer/Dockerfile .
 
       - name: Set up Node.js 18
         uses: actions/setup-node@v3
@@ -60,7 +60,7 @@ jobs:
         working-directory: app
 
       - name: Build Docker Image for App
-        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/app:${{ github.sha }} -f app/Dockerfile .
+        run: docker build -t "${{ secrets.DOCKER_REGISTRY }}"/app:${{ github.ref }} -f app/Dockerfile .
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -70,9 +70,9 @@ jobs:
 
       - name: Push Docker images to registry
         run: |
-          docker push "${{ secrets.DOCKER_REGISTRY }}"/api:${{ github.sha }}
-          docker push "${{ secrets.DOCKER_REGISTRY }}"/producer:${{ github.sha }}
-          docker push "${{ secrets.DOCKER_REGISTRY }}"/app:${{ github.sha }}
+          docker push "${{ secrets.DOCKER_REGISTRY }}"/api:${{ github.ref }}
+          docker push "${{ secrets.DOCKER_REGISTRY }}"/producer:${{ github.ref }}
+          docker push "${{ secrets.DOCKER_REGISTRY }}"/app:${{ github.ref }}
 
       - name: Deploy to server
         run: |
