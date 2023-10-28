@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'yarn'
+          cache-dependency-path: 'app/yarn.lock'
 
       - name: Cache API Gradle packages
         uses: actions/cache@v3
