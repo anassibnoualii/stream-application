@@ -83,7 +83,6 @@ jobs:
         with:
           email: ${{ secrets.EMAIL }}
           api_key: ${{ secrets.HEROKU_API_KEY }}
-          docker_compose_file: './docker-compose.prod.yml'
-          heroku_apps: '[{"imagename":"app","appname":"app","apptype":"web"},{"imagename":"api","appname":"api","apptype":"java"},{"imagename":"producer","appname":"producer","apptype":"java"}]'
+          docker_compose_file: './docker-compose-prod.yml'
         env:
           CI: true
