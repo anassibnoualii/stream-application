@@ -26,10 +26,10 @@ services:
     image: elasticsearch:8.10.2
     container_name: elasticsearch
     environment:
-      - cluster.name=es-docker-cluster
-      - node.name=es-node
-      - discovery.type=single-node
-      - xpack.security.enabled=false
+      cluster.name: es-docker-cluster
+      node.name: es-node
+      discovery.type: single-node
+      xpack.security.enabled: false
     volumes:
       - es_data:/usr/share/elasticsearch/data
     ports:
@@ -41,7 +41,7 @@ services:
     image: kibana:8.10.2
     container_name: kibana
     environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     ports:
       - target: 5601
         published: 5601
@@ -57,16 +57,16 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka
     environment:
-      - KAFKA_NODE_ID=0
-      - KAFKA_PROCESS_ROLES=controller,broker
-      - KAFKA_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-      - KAFKA_LISTENERS=PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - CLUSTER_ID=4L6g3nShT-eMCtK--X86sw
+      KAFKA_NODE_ID: 0
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      CLUSTER_ID: 4L6g3nShT-eMCtK--X86sw
     restart: always
   kafka-ui:
     container_name: kafka-ui
