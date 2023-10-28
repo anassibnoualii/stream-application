@@ -60,6 +60,10 @@ const App = () => {
 
   useEffect(() => {
     loadChartData();
+    const intervalId = setInterval(loadChartData, 10 * 1000);
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
   return (

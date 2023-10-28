@@ -12,6 +12,18 @@ services:
       - kafka
       - elasticsearch
     restart: always
+
+  stream-producer:
+    container_name: stream-producer
+    build:
+      dockerfile: producer/Dockerfile
+      context: .
+    ports:
+      - "8082:8082"
+    depends_on:
+      - kafka
+    restart: always
+
   stream-app:
     container_name: stream-app
     build:
@@ -19,9 +31,15 @@ services:
       context: .
     ports:
       - "80:80"
+    volumes:
+      - ./:/app:delegated
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - stream-api
     restart: always
+
   elasticsearch:
     image: elasticsearch:8.10.2
     container_name: elasticsearch
@@ -68,6 +86,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       CLUSTER_ID: 4L6g3nShT-eMCtK--X86sw
     restart: always
+
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest

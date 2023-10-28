@@ -1,10 +1,11 @@
 package com.crafts.stream.kafka;
 
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -32,6 +33,6 @@ public class KafkaProducer {
         null,
         id,
         document,
-        List.of(new RecordHeader("ID", StringUtils.getBytesUtf8(id))));
+        List.of(new RecordHeader("ID", StringUtils.getBytes(id, Charset.defaultCharset()))));
   }
 }
