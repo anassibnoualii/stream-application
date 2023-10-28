@@ -1,0 +1,65 @@
+name: Main CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  api:
+    name: API Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Build with Gradle
+        run: ./api/gradlew build
+
+      - name: Test with Gradle
+        run: ./api/gradlew test
+
+  producer:
+    name: Producer Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Build with Gradle
+        run: ./producer/gradlew build
+
+      - name: Test with Gradle
+        run: ./producer/gradlew test
+
+  app:
+    name: App Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Use the Node.js version compatible with your app
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build app
+        run: npm run build
+
+      - name: Deploy to hosting service
+        run: |
+          # Add your deployment commands here
