@@ -1,46 +1,57 @@
-name: CI/CD.
+name: Build and Deploy
+
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+ push:
     branches:
       - main
 
 jobs:
-  build-api:
-    name: Build api
+ build-and-deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        # Mobile folder working directory.
-        working-directory: api
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-        with:
-          arguments: build
-  # Mobile folder job.
-  build-producer:
-    name: Build producer
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: producer
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-        with:
-          arguments: build
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+        restore-keys: ${{ runner.os }}-gradle
+
+    - name: Build Spring Boot App 1
+      run: ./gradlew build
+      working-directory: spring-boot-app-1
+
+    - name: Build Spring Boot App 2
+      run: ./gradlew build
+      working-directory: spring-boot-app-2
+
+    - name: Set up Node.js 18
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+
+    - name: Cache NPM packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-node
+
+    - name: Build React App
+      run: npm ci && npm run build
+      working-directory: react-app
+
+    - name: Deploy to server
+      run: |
+        # Add your deployment commands here
+      env:
+        CI: true
