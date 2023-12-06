@@ -30,7 +30,7 @@ services:
       dockerfile: app/Dockerfile
       context: .
     ports:
-      - "80:80"
+      - "81:81"
     volumes:
       - ./:/app:delegated
       - /app/node_modules

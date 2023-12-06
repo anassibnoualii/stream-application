@@ -14,5 +14,5 @@ FROM nginx:stable-alpine-slim
 COPY --from=builder /app/build /usr/share/nginx/html
 # new
 COPY app/nginx/nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+EXPOSE 81
 CMD ["nginx", "-g", "daemon off;"]
