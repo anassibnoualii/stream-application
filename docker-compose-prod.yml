@@ -24,7 +24,7 @@ services:
     container_name: stream-app
     image: ${DOCKER_REGISTRY}/app:${DOCKER_TAG}
     ports:
-      - "80:80"
+      - "81:81"
     depends_on:
       - stream-api
     restart: always
