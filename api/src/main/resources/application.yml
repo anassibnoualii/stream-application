@@ -9,6 +9,6 @@ spring:
   elasticsearch:
     uris: http://elasticsearch:9200
 server:
-  port: 8081
+  port: 8088
   servlet:
     context-path: /api
