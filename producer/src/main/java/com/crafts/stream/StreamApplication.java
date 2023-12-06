@@ -1,6 +1,7 @@
 package com.crafts.stream;
 
 import com.crafts.stream.kafka.KafkaProducer;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -26,13 +27,13 @@ public class StreamApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    getStreamData()
-        .toStream()
-        .forEach(
-            s -> {
-              log.info("data from stream: {}", s);
-              kafkaProducer.loadData(s);
-            });
+    Flux.interval(Duration.ofSeconds(15))
+        .flatMap(tick -> getStreamData())
+        .doOnNext(s -> {
+          log.info("data from stream: {}", s);
+          kafkaProducer.loadData(s);
+        })
+        .subscribe();
   }
 
   public Flux<String> getStreamData() {
