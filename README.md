@@ -7,3 +7,6 @@ Run ```docker-compose up -d``` command to start the stack
 ## React
 ## Elasticsearch
 ## Kafka
+
+
+![Architecture](./docs/stream-app.jpeg)
